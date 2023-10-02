@@ -7,17 +7,18 @@ const app = express();
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Provide an absolute path to the destination directory
-    cb(null, path.join(__dirname, 'uploads')); // This assumes uploads directory is in the same folder as your script
+    cb(null, path.join(__dirname, 'uploads')); // This assumes the 'uploads' directory is in the same folder as your script
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + ".jpg");
+    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
   },
 });
 
-const upload = multer({ storage }).single("download");
+const upload = multer({ storage });
 
-app.post('/upload', upload, function (req, res, next) {
-  res.send("File uploaded");
+app.post('/upload', upload.array('download', 3), function (req, res, next) {
+  // req.files contains an array of uploaded files
+  res.send("Files uploaded");
 });
 
 app.listen(5000, () => {
